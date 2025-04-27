@@ -10,7 +10,10 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "axios": "^1.8.4",
+    "@raydium-io/raydium-sdk-v2": "^0.1.127-alpha",
+    "@solana/spl-token": "^0.4.13",
+    "@solana/web3.js": "^1.98.2",
+    "axios": "^1.9.0",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "nodemon": "^3.1.9",
