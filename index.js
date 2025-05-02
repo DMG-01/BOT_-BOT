@@ -2,7 +2,7 @@ const { raydiumGetSwapQuote } = require("./Dex/raydium");
 const { getTokenDetails } = require("./Dex/dexscreener");
 const {getTokenPrice} = require("./Dex/pumpFun")
 function run() {
-  const inputMint = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'; // USDC
+  const inputMint = 'Df6yfrKC8kZE3KNkrHERKzAetSxbrWeniQfyJY4Jpump'; // USDC
   const outputMint = 'JmMRbLcKgNCu17yHZDAn4strE5NjmWJ4pCeJ7s7boop'; // Custom token
   const amount = 1 * 10 ** 9; // 1 USDC in lamports
   const slippage = 0.5;
@@ -20,5 +20,5 @@ function run() {
  
 }
 
-getTokenPrice("Df6yfrKC8kZE3KNkrHERKzAetSxbrWeniQfyJY4Jpump")
+getTokenPrice("H2NsueznuMFt4ehPsiAvBwrLddSYXvuBZmeYCX6hpump")
 //run();
