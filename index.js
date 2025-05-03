@@ -1,4 +1,93 @@
-const { raydiumGetSwapQuote } = require("./Dex/raydium");
+const express = require("express")
+const sequelize = require("./connectDb")
+
+const app = express()
+
+
+const run = async()=> {
+
+  try {
+
+    await sequelize.authenticate()
+const PORT = 4000
+app.listen((PORT,async()=> {
+
+  console.log(`listening on port ${PORT}`)
+}))
+  }catch(error) {
+    console.log({error})
+  }
+}
+
+
+run()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*const { raydiumGetSwapQuote } = require("./Dex/raydium");
 const { getTokenDetails } = require("./Dex/dexscreener");
 const {getTokenPrice} = require("./Dex/pumpFun")
 function run() {
@@ -20,5 +109,7 @@ function run() {
  
 }
 
-getTokenPrice("H2NsueznuMFt4ehPsiAvBwrLddSYXvuBZmeYCX6hpump")
+//getTokenPrice("H2NsueznuMFt4ehPsiAvBwrLddSYXvuBZmeYCX6hpump")
+getTokenDetails("solana","H2NsueznuMFt4ehPsiAvBwrLddSYXvuBZmeYCX6hpump" )
 //run();
+*/
