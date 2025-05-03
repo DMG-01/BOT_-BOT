@@ -3,28 +3,39 @@ const ethWeb3 = require('web3');
 const statusCodes = require('http-status-codes');
 const crypto = require("crypto")
 require("dotenv").config()
+const {user} = require("../models/association")
 
 const signUp = async (req, res) => {
     
   try {
-    const { userName, emailAddress } = req.body;
+    const { userName, emailAddress, password } = req.body;
 
-    if (!userName || !emailAddress) {
+    if (!userName || !emailAddress || !password) {
       return res.status(statusCodes.BAD_REQUEST).json({
         isSuccess: false,
         msg: 'Missing required parameters',
       });
     }
 
-    // Ethereum Wallet
+   
     const eth = ethWeb3.eth.accounts.create();
     const ethAddress = eth.address;
-    const ethPrivateKey = eth.privateKey;
+    const ethPrivateKey = encrypt(eth.privateKey);
 
-    // Solana Wallet
+  
     const sol = Keypair.generate();
     const solPublicKey = sol.publicKey.toBase58();
-    const solPrivateKey = Buffer.from(sol.secretKey).toString('base64');
+    const solPrivateKey =  encrypt(Buffer.from(sol.secretKey).toString('base64'));
+
+    const newUser = await user.create({
+        userName,
+        emailAddress, 
+        password, 
+        evmAddress : ethAddress, 
+        ethereumPrivateKey : ethPrivateKey, 
+        solanaAddress : solPublicKey, 
+        solanaPrivateKey : solPrivateKey
+    })
 
     return res.status(statusCodes.OK).json({
       isSuccess: true,
@@ -37,6 +48,7 @@ const signUp = async (req, res) => {
         publicKey: solPublicKey,
         privateKey: solPrivateKey,
       },
+      newUser
     });
   } catch (error) {
     console.error(error);

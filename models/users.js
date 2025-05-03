@@ -1,6 +1,6 @@
 const sequelize = require("../connectDb")
 const {DataTypes} = require("sequelize")
-const bcrypt = require("bcrypt")
+const bcrypt = require("bcryptjs")
 const user = sequelize.define("users", {
     userName : {
         type : DataTypes.STRING, 
@@ -32,11 +32,11 @@ user.beforeCreate(async (userInstance) => {
     userInstance.password = await bcrypt.hash(userInstance.password, salt);
   });
   
-  user.prototype.comparePassword = async function (candidatePassword) {
+user.prototype.comparePassword = async function (candidatePassword) {
     return await bcrypt.compare(candidatePassword, this.password);
   };
   
-  user.prototype.createJWT = function () {
+user.prototype.createJWT = function () {
     return jwt.sign(
       { userId: this.userId, role: this.role },
       process.env.GUARD_JWT_SECRET,
