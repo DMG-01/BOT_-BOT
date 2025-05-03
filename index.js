@@ -1,8 +1,13 @@
 const express = require("express")
 const sequelize = require("./connectDb")
+const userRouter = require("./routes/userRoute")
 
 const app = express()
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
+
+app.use("/user",userRouter)
 
 const run = async()=> {
 
@@ -10,10 +15,10 @@ const run = async()=> {
 
     await sequelize.authenticate()
 const PORT = 4000
-app.listen((PORT,async()=> {
+app.listen(PORT,async()=> {
 
   console.log(`listening on port ${PORT}`)
-}))
+})
   }catch(error) {
     console.log({error})
   }
