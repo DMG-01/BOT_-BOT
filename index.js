@@ -1,13 +1,15 @@
 const express = require("express")
 const sequelize = require("./connectDb")
 const userRouter = require("./routes/userRoute")
-
+const {} = require("./middleware/authentication")
+const authRouter = require("./routes/auth")
 const app = express()
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
 app.use("/user",userRouter)
+app.use("/", authRouter)
 
 const run = async()=> {
 
