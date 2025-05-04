@@ -13,18 +13,6 @@ const user = sequelize.define("users", {
     password  : {
         type : DataTypes.TEXT, 
         allowNull : false
-    }, 
-    evmAddress : {
-        type : DataTypes.TEXT, 
-    }, 
-    ethereumPrivateKey : {
-        type : DataTypes.TEXT
-    }, 
-    solanaAddress : {
-        type : DataTypes.TEXT
-    }, 
-    solanaPrivateKey : {
-        type : DataTypes.TEXT
     }
 })
 user.beforeCreate(async (userInstance) => {

@@ -3,7 +3,7 @@ const ethWeb3 = require('web3');
 const statusCodes = require('http-status-codes');
 const crypto = require("crypto")
 require("dotenv").config()
-const {user} = require("../models/association")
+const {user,ethAccounts, solAccounts } = require("../models/association")
 
 const signUp = async (req, res) => {
     
@@ -30,13 +30,21 @@ const signUp = async (req, res) => {
     const newUser = await user.create({
         userName,
         emailAddress, 
-        password, 
-        evmAddress : ethAddress, 
-        ethereumPrivateKey : ethPrivateKey, 
-        solanaAddress : solPublicKey, 
-        solanaPrivateKey : solPrivateKey
+        password
     })
 
+    const newEthAccount = await ethAccounts.create({
+            address : ethAddress, 
+            privateKey : ethPrivateKey, 
+            userId : newUser.id
+    })
+
+    const newSolAccount = await solAccounts.create({
+            address : solPublicKey, 
+            privateKey : solPrivateKey, 
+            userId : newUser.id
+    })
+    
     return res.status(statusCodes.OK).json({
       isSuccess: true,
       msg: 'Wallets generated successfully',
@@ -58,6 +66,65 @@ const signUp = async (req, res) => {
     });
   }
 };
+
+const getUserDetails = async(req,res)=> {
+     try {
+        if(!req.body) {
+            return res.status(statusCodes.BAD_REQUEST).json({
+                isSuccess : false, 
+                msg:`req.body not found`
+            })
+        }
+        const {userName} = req.body
+
+        if(!userName) {
+            return res.status(statusCodes.BAD_REQUEST).json({
+                isSuccess : false, 
+                msg:`missing required parameter`
+            })
+        }
+
+        
+        const userDetails = await user.findOne({
+            where : {
+                userName 
+               
+            } , 
+            include : [{
+                model :ethAccounts, 
+                as : "ethAccount", 
+                attributes : ["address"]
+
+            }, {
+                model : solAccounts, 
+                as : "solAccount", 
+                attributes : ["address"]
+            }
+        ], attributes : ["userName", "id", "emailAddress"]
+        })
+
+        if(!userDetails) {
+            return res.status(statusCodes.NOT_FOUND).json({
+                isSuccess : true, 
+                msg : `No account under the userName ${userName}`
+            })
+        }
+
+
+        return res.status(statusCodes.OK).json({
+            isSuccess : true, 
+            user : userDetails
+        })
+
+    
+
+     }catch(error) {
+        return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
+            isSuccess : false, 
+            error
+        })
+     }
+}
 
 
 const algorithm = "aes-256-ctr";
@@ -83,4 +150,4 @@ const decrypt = (hash) => {
     return decrypted.toString();
 };
 
-module.exports = { signUp };
+module.exports = { signUp, getUserDetails };

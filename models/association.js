@@ -14,8 +14,32 @@ const sequelize = new Sequelize(
 
 
 const user = require("./users")
+const solAccounts = require("./solAccounts")
+const ethAccounts = require("./ethAccounts")
+
+
+user.hasMany(solAccounts, {
+    foreignKey : "userId", 
+    as : "solAccount"
+})
+
+solAccounts.belongsTo(user, {
+    foreignKey : "userId", 
+    as : "user"
+})
+
+user.hasMany(ethAccounts, {
+  foreignKey : "userId", 
+  as : "ethAccount"
+})
+
+ethAccounts.belongsTo(user, {
+    foreignKey : "userId", 
+    as :"user"
+})
 
 
 
-module.exports = {user}
+
+module.exports = {user, ethAccounts, solAccounts}
 
