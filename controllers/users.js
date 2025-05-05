@@ -91,6 +91,17 @@ const importWallet = async(req, res)=> {
         }
             console.log(`privateKyyyy : ${privateKey}`)
         if(chainId === "ethereum" && privateKey) {
+
+            const isAccount = await ethAccounts.findOne({
+                where : {
+                    privateKey : await encrypt(privateKey), 
+                    userId : req.user.userId
+                }
+            })
+            console.log({isAccount})
+
+    
+
            const newAccount =  ethWeb3.eth.accounts.privateKeyToAccount(`0x${privateKey}`)
            if(!newAccount) {
             return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({isSuccess : false, msg:`INVALID PRIVATE KEY`})
@@ -98,12 +109,14 @@ const importWallet = async(req, res)=> {
 
            constNewEthAccount = await ethAccounts.create({
                 address : newAccount.address, 
-                privateKey : encrypt(newAccount.privateKey)
+                privateKey : encrypt(newAccount.privateKey), 
+                userId : req.user.userId
            })
 
            return res.status(statusCodes.OK).json({isSuccess : true, msg:`account with address ${newAccount.address} has been successfully imported`})
 
-        }
+        
+    }
 
     }catch(error) {
         console.log(error)

@@ -17,7 +17,7 @@ const run = async()=> {
 
     await sequelize.authenticate()
 
-    await sequelize.sync({ alter: true }) 
+    await sequelize.sync({alter: true }) 
 const PORT = 4000
 app.listen(PORT,async()=> {
 

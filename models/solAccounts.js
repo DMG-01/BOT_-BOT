@@ -4,10 +4,14 @@ const {DataTypes} =  require("sequelize")
 
 const solAccounts = sequelize.define("solanaAccount", {
     address : {
-        type : DataTypes.TEXT
+        type : DataTypes.STRING,
+        allowNull : false, 
+        unique : true
     }, 
     privateKey : {
-        type : DataTypes.TEXT
+        type : DataTypes.STRING,
+        allowNull: false, 
+        unique : true
     }
 })
 

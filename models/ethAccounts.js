@@ -3,10 +3,14 @@ const {DataTypes} = require("sequelize")
 
 const ethereumAccount = sequelize.define("ethereumAccount", {
     address : {
-        type :DataTypes.TEXT
+        type :DataTypes.STRING, 
+        unique : true, 
+        allowNull : false
     }, 
     privateKey : {
-        type : DataTypes.TEXT
+        type : DataTypes.STRING, 
+        unique : true, 
+        allowNull :false
     }
 })
 
