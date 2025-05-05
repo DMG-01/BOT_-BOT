@@ -3,6 +3,7 @@ const ethWeb3 = require('web3');
 const statusCodes = require('http-status-codes');
 const crypto = require("crypto")
 require("dotenv").config()
+const bs58 = require("bs58")
 const {encrypt, decrypt} = require("../utils/encryption") 
 const {user,ethAccounts, solAccounts } = require("../models/association")
 
@@ -114,9 +115,33 @@ const importWallet = async(req, res)=> {
            })
 
            return res.status(statusCodes.OK).json({isSuccess : true, msg:`account with address ${newAccount.address} has been successfully imported`})
-
         
+    }  
+
+    if(chainId==="solana" && privateKey) {
+
+        try {
+
+            const decode = bs58.decode(privateKey)
+            const newSolAccount =  Keypair.fromSecretKey(decode) 
+           
+               await solAccounts.create({
+                address : newSolAccount.publicKey.toBase58(), 
+                privateKey : encrypt(privateKey),
+                userId : req.user.userId
+               })
+
+
+                return res.status(statusCodes.OK).json({isSuccess : true, msg :`${newSolAccount.publicKey.toBase58()} imported successfully`})
+        }catch(error) {
+            console.log(error)
+            return res.status(statusCodes.OK).json({
+                isSuccess : false, 
+                msg : `INTERNAL_SERVER_ERROR`
+            })
+        }
     }
+    
 
     }catch(error) {
         console.log(error)
