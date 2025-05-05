@@ -148,4 +148,27 @@ const login =  async(req,res) => {
 }
 
 
-module.exports = {signUp, login}
+const userAuthentication = async(req,res, next)=> {
+
+  try {
+
+    const token = req.headers.authorization
+     if(!token) {
+      return res.status(statusCodes.BAD_REQUEST).json({isSuccess: false, msg :`NO TOKEN FOUND`})
+     }
+
+     const payload = jwt.verify(token, process.env.JWT_SECRET)
+     req.user = {
+          userId :payload.userId, 
+          userName : payload.userName
+     }
+     next()
+
+  }catch(error) {
+    console.log(error)
+    return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({isSuccess : false, msg : `INTERNAL_SERVER_ERROR`})
+  }
+}
+
+
+module.exports = {signUp, login, userAuthentication}

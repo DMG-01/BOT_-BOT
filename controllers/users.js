@@ -3,6 +3,7 @@ const ethWeb3 = require('web3');
 const statusCodes = require('http-status-codes');
 const crypto = require("crypto")
 require("dotenv").config()
+const {encrypt, decrypt} = require("../utils/encryption") 
 const {user,ethAccounts, solAccounts } = require("../models/association")
 
 
@@ -67,5 +68,52 @@ const getUserDetails = async(req,res)=> {
 }
 
 
+const importWallet = async(req, res)=> {
+    try {
 
-module.exports = {getUserDetails };
+        const _user = await user.findOne({
+            where : {
+                id : req.user.userId, 
+                userName : req.user.userName
+            }
+        })
+        if(!req.body) {
+            return res.status(statusCodes.BAD_REQUEST).json({
+                isSuccess : false, 
+                msg:`MISSING REQ.BODY`
+            })
+        }
+
+        const {chainId, privateKey, mnemonicPhrase} = req.body
+
+        if((!chainId && !privateKey) || (!chainId && !mnemonicPhrase)) {
+            return res.status(statusCodes.BAD_REQUEST).json({isSuccess : false, msg:`missing required parameter`})
+        }
+            console.log(`privateKyyyy : ${privateKey}`)
+        if(chainId === "ethereum" && privateKey) {
+           const newAccount =  ethWeb3.eth.accounts.privateKeyToAccount(`0x${privateKey}`)
+           if(!newAccount) {
+            return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({isSuccess : false, msg:`INVALID PRIVATE KEY`})
+           } 
+
+           constNewEthAccount = await ethAccounts.create({
+                address : newAccount.address, 
+                privateKey : encrypt(newAccount.privateKey)
+           })
+
+           return res.status(statusCodes.OK).json({isSuccess : true, msg:`account with address ${newAccount.address} has been successfully imported`})
+
+        }
+
+    }catch(error) {
+        console.log(error)
+        return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
+            isSuccess : false,
+            msg : `INTERNAL_SERVER_ERROR`
+        })
+    }
+}
+
+
+
+module.exports = {getUserDetails, importWallet };

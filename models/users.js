@@ -27,7 +27,7 @@ user.prototype.comparePassword = async function (candidatePassword) {
   
 user.prototype.createJWT = function () {
     return jwt.sign(
-      { userId: this.userId, role: this.role },
+      { userId: this.id, userName: this.userName },
       process.env.JWT_SECRET,
       { expiresIn: "30d" }
     );
