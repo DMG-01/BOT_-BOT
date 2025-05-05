@@ -2,6 +2,7 @@ const { Keypair } = require('@solana/web3.js');
 const ethWeb3 = require('web3');
 const statusCodes = require('http-status-codes');
 const crypto = require("crypto")
+const jwt = require("jsonwebtoken")
 require("dotenv").config()
 const {user,ethAccounts, solAccounts } = require("../models/association")
 
@@ -93,5 +94,58 @@ const signUp = async (req, res) => {
   }
 };
 
+const login =  async(req,res) => {
+   
+  try {
 
-module.exports = {signUp}
+    if(!req.body) {
+      return res.status(statusCodes.BAD_REQUEST).json({
+        isSuccess : false, 
+        msg:`missing req.body`
+      })
+    }
+
+    const {userName, password} = req.body
+         if(!userName || !password) {
+          return res.status(statusCodes.BAD_REQUEST).json({
+            isSuccess : false, 
+            msg:`missing required parameter`
+          })
+         }
+
+         const _user = await user.findOne({
+          where : {
+            userName
+          }
+         })
+
+         if(!_user) {
+          return res.status(statusCodes.NOT_FOUND).json({
+            isSuccess : false,
+            msg :`no account with username ${userName} found`
+          })
+         }
+
+         const isPassword = await _user.comparePassword(password)
+
+         if(!isPassword) {
+            return res.status(statusCodes.UNAUTHORIZED).json({
+              isSuccess : false, 
+              msg:`INCORRECT PASSWORD`
+            })
+         }
+
+         const jsonToken = await _user.createJWT()
+
+         return res.status(statusCodes.OK).json({isSuccess :true, jsonToken})
+  }catch(error) {
+    console.log(error)
+    return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
+      isSuccess : false, 
+      msg : `INTERNAL _ERROR_OCCURED`
+    })
+  }
+}
+
+
+module.exports = {signUp, login}

@@ -1,6 +1,7 @@
 const sequelize = require("../connectDb")
 const {DataTypes} = require("sequelize")
 const bcrypt = require("bcryptjs")
+const jwt = require("jsonwebtoken")
 const user = sequelize.define("users", {
     userName : {
         type : DataTypes.STRING, 
@@ -27,7 +28,7 @@ user.prototype.comparePassword = async function (candidatePassword) {
 user.prototype.createJWT = function () {
     return jwt.sign(
       { userId: this.userId, role: this.role },
-      process.env.GUARD_JWT_SECRET,
+      process.env.JWT_SECRET,
       { expiresIn: "30d" }
     );
   };
