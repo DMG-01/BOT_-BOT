@@ -3,6 +3,7 @@ const sequelize = require("./connectDb")
 const userRouter = require("./routes/userRoute")
 const {} = require("./middleware/authentication")
 const authRouter = require("./routes/auth")
+const tradeRouter = require("./routes/trade")
 const app = express()
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -10,6 +11,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/user",userRouter)
 app.use("/", authRouter)
+app.use("/trade", tradeRouter)
 
 const run = async()=> {
 
