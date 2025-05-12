@@ -178,7 +178,10 @@ const getAccountBalance = async(req,res)=> {
             'Referer': 'https://jup.ag',
 
         })
-        console.log(response.data)
+        return res.status(statusCodes.OK).json({
+            isSuccess : true, 
+            balances : response.data
+        })
     }catch(error) {
         console.log(error)
         console.log(error.status)
