@@ -13,6 +13,28 @@ app.use("/user",userRouter)
 app.use("/", authRouter)
 app.use("/trade", tradeRouter)
 
+const axios = require('axios');
+
+async function getJupiterBalance(address) {
+  try {
+    const url = `https://lite-api.jup.ag/ultra/v1/balances/${address}`;
+    const headers = {
+      //'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+      'Accept': 'application/json',
+      'Origin': 'https://jup.ag',
+      'Referer': 'https://jup.ag',
+    };
+
+    const response = await axios.get(url, { headers });
+    console.log(response.data);
+  } catch (error) {
+    console.error("Error fetching balance:", error.response?.data || error.message);
+  }
+}
+
+//getJupiterBalance("5QKgkzyfSznWmNbcDdXaxNMhM6Nn6Zhz3igEwpXqUQM7");
+
+
 const run = async()=> {
 
   try {

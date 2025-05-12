@@ -1,7 +1,8 @@
 const user = require("./users")
 const statusCodes = require("http-status-codes")
 const {getTokenDetails} = require("../Dex/dexscreener")
-const {raydiumGetSwapQuote} = require("../Dex/raydium")
+const {raydiumGetSwapQuote, raydiumPerformSwap} = require("../Dex/raydium")
+const {getOrder} = require("../Dex/jupiter.js")
 const getQuote = async(req,res)=> {
     try {
 
@@ -78,7 +79,8 @@ const getQuote = async(req,res)=> {
 
             return res.status(statusCodes.OK).json({
                 isSuccess : true, 
-                quote :_quote
+                quote :_quote, 
+                mainQuote :quote
             })
         }else {
             console.log(`not raydium`)
@@ -90,4 +92,71 @@ const getQuote = async(req,res)=> {
     }
 }
 
-module.exports =  {getQuote}
+
+const performSwap = async(req,res)=> {
+if(!req.body) {
+    return res.status(statusCodes.BAD_REQUEST).json({isSuccess : false, msg:`missing req.body`})
+}
+
+const {wrapSol, unwrapSol, inputAccount, outputAccount, computeUnitPriceMicroLamports, amount} = req.body
+
+    try {
+        console.log(`getting quote.....`)
+        const swapResponse = await raydiumGetSwapQuote("So11111111111111111111111111111111111111112", "JmMRbLcKgNCu17yHZDAn4strE5NjmWJ4pCeJ7s7boop",10000000,0.5, "v0" )
+        console.log({raydiummmmmmm_quoteeeeeeee: swapResponse})
+        const data = await raydiumPerformSwap("5QKgkzyfSznWmNbcDdXaxNMhM6Nn6Zhz3igEwpXqUQM7",wrapSol, unwrapSol, swapResponse, computeUnitPriceMicroLamports, "v0"   )
+
+    }catch(error) {
+        return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({isSuccess : false, error })
+    }
+}
+
+
+const order = async (req, res) => {
+    try {
+      if (!req.body) {
+        return res.status(statusCodes.BAD_REQUEST).json({ isSuccess: false, msg: `missing req.body` });
+      }
+      const { inputMint, outputMint, amount } = req.body;
+      if (!inputMint || !outputMint || !amount) {
+        return res.status(statusCodes.BAD_REQUEST).json({ isSuccess: false, msg: `missing required parameter` });
+      }
+  
+      const response = await getOrder(inputMint, outputMint, amount);
+  
+      if (response.status !== 200) {
+        
+        let errorMessage = 'Failed to get order from Jupiter API.';
+        let invalidOutputMint;
+  
+        if (response.status === 400 && response.data && response.data.error === 'Invalid outputMint') {
+          errorMessage = 'Invalid outputMint provided.';
+          invalidOutputMint = outputMint; 
+        } else if (response.data && response.data.error) {
+          errorMessage = response.data.error; 
+        }
+  
+        return res.status(statusCodes.BAD_REQUEST).json({
+          isSuccess: false,
+          response: {
+            message: errorMessage,
+            invalidOutputMint: invalidOutputMint,
+            jupiterResponse: response.data, 
+            status: response.status,
+          },
+        });
+      }
+  
+      if (response.status === 200) {
+        return res.status(statusCodes.OK).json({ isSuccess: true, data: response.data }); // Send response.data
+      }
+    } catch (error) {
+      console.error("Error in order controller:", error);
+      return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ isSuccess: false, msg: `INTERNAL_SERVER_ERROR` });
+    }
+  };
+  
+
+
+
+module.exports =  {getQuote, performSwap, order}

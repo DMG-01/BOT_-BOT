@@ -4,6 +4,7 @@ const statusCodes = require('http-status-codes');
 const crypto = require("crypto")
 require("dotenv").config()
 const bs58 = require("bs58")
+const axios = require("axios")
 const {encrypt, decrypt} = require("../utils/encryption") 
 const {user,ethAccounts, solAccounts } = require("../models/association")
 
@@ -153,5 +154,38 @@ const importWallet = async(req, res)=> {
 }
 
 
+const getAccountBalance = async(req,res)=> {
+      
+    try {
+        if(!req.body) {
+            return res.status(statusCodes.BAD_REQUEST).json({
+                isSuccess : false, 
+                msg:`missing req.body`
+            })
+        }
 
-module.exports = {getUserDetails, importWallet };
+        const {address} = req.body
+        if(!address) {
+            return res.status(statusCodes.BAD_REQUEST).json({
+                isSuccess : false, 
+                msg: `missing address parameter`
+            })
+        }
+
+        const response = await axios.get(`https://lite-api.jup.ag/ultra/v1/balances/${address}`, {
+            'Accept' :'application/json', 
+            'Origin': 'https://jup.ag',
+            'Referer': 'https://jup.ag',
+
+        })
+        console.log(response.data)
+    }catch(error) {
+        console.log(error)
+        console.log(error.status)
+        return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({isSuccess : false, msg: `INTERNAL_SERVER_ERROR_OCCURED`, error})
+    }
+}
+
+
+
+module.exports = {getUserDetails, importWallet, getAccountBalance };

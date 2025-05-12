@@ -25,8 +25,39 @@ async function raydiumGetSwapQuote(inputMint, outputMint, amount, slippage = 0.5
       return null;
     }
   }
+
+
+  const raydiumPerformSwap = async ({
+    publicKey,
+    wrapSol = false,
+    unwrapSol = false,
+    inputAccount,
+    outputAccount,
+    swapResponse,
+    computeUnitPriceMicroLamports,
+    txVersion = 'V0'
+  }) => {
+    try {
+      const swapUrl = `${API_URLS.SWAP_HOST}/transaction/swap-base-in`;
+  
+      const response = await axios.post(swapUrl, {
+        wallet: publicKey,
+        wrapSol,
+        unwrapSol,
+        inputAccount : "So11111111111111111111111111111111111111112",
+        swapResponse,
+        computeUnitPriceMicroLamports: String(computeUnitPriceMicroLamports),
+        txVersion
+      });
+  
+      console.log("Swap response:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Swap error:", error.response?.data || error.message);
+    }
+  };
   
 
-  module.exports = {raydiumGetSwapQuote}
+  module.exports = {raydiumGetSwapQuote,raydiumPerformSwap}
 
 
