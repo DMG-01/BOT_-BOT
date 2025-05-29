@@ -14,7 +14,8 @@ const getOrder = async(inputMint, outputMint, amount)=> {
             amount
             }
         })
-
+        console.log(`responseeeeeeeeeeeeeeeeeeeeee from orderrrrrrrrrrrrrrrrrrrr`)
+        console.log(response)
         return response
         
     }catch(error) {

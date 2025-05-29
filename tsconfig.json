@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES6",                           // Output ES6 compatible JS
+    "module": "commonjs",                      // CommonJS modules for Node.js
+    "rootDir": "./src",                        // Source files location
+    "outDir": "./dist",                        // Compiled files location
+    "esModuleInterop": true,                   // Allows `import express from 'express'`
+    "forceConsistentCasingInFileNames": true,  // File casing check
+    "strict": true,                            // Enable all strict type checks
+    "skipLibCheck": true,                      // Skip type checking for .d.ts files
+    "resolveJsonModule": true,                 // Allow importing .json files
+    "moduleResolution": "node",                // Use Node-style module resolution
+    "allowSyntheticDefaultImports": true       // Allow default imports from CJS modules
+  },
+  "include": ["src"],                          // Include all TS files in src
+  "exclude": ["node_modules", "dist"]          // Exclude build output and node_modules
+}

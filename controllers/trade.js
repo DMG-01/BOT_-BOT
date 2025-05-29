@@ -1,8 +1,10 @@
-const user = require("./users")
+const user = require("./users.js")
 const statusCodes = require("http-status-codes")
-const {getTokenDetails} = require("../Dex/dexscreener")
-const {raydiumGetSwapQuote, raydiumPerformSwap} = require("../Dex/raydium")
+const {getTokenDetails} = require("../Dex/dexscreener.js")
+const {raydiumGetSwapQuote, raydiumPerformSwap} = require("../Dex/raydium.js")
 const {getOrder} = require("../Dex/jupiter.js")
+const axios = require("axios")
+
 const getQuote = async(req,res)=> {
     try {
 
@@ -123,7 +125,7 @@ const order = async (req, res) => {
       }
   
       const response = await getOrder(inputMint, outputMint, amount);
-  
+      
       if (response.status !== 200) {
         
         let errorMessage = 'Failed to get order from Jupiter API.';
@@ -148,7 +150,7 @@ const order = async (req, res) => {
       }
   
       if (response.status === 200) {
-        return res.status(statusCodes.OK).json({ isSuccess: true, data: response.data }); // Send response.data
+        return res.status(statusCodes.OK).json({ isSuccess: true, data: response.data/*, fullData : response*/}); // Send response.data
       }
     } catch (error) {
       console.error("Error in order controller:", error);
@@ -157,6 +159,49 @@ const order = async (req, res) => {
   };
   
 
+  const executeOrder = async(req,res)=> {
+    
+    try {
+            if(!req.body) {
+                return res.status(statusCodes.BAD_GATEWAY).json({
+                    isSuccess : false, 
+                    msg :`missing req.body`
+                })
+            }
+
+            const {inputMint, outputMint, amount} = req.body
+            if(!inputMint || !outputMint || !amount) {
+                return res.status(statusCodes.BAD_REQUEST).json({
+                    isSuccess: false, 
+                    msg : `missing required parameter`
+                })
+            }
+
+            const response = await getOrder(inputMint, outputMint, amount)
+            console.log(response.transaction)
+            if(!response.data.requestId) {
+                console.log(`msg: error in line 179`)
+                return 0
+            }
+
+            const requestId = response.data.requestId
+            console.log(requestId)
+            
+            /*const executeOrder = await axios.post("https://lite-api.jup.ag/ultra/v1/execute", {
+                signedTransaction :  
+                requestId    
+            })
+            */
+    }catch(error) {
+        console.log(error)
+        return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
+            isSuccess : false,
+            msg : `an internal error occured`, 
+            error : error
+        })
+    }
+  }
 
 
-module.exports =  {getQuote, performSwap, order}
+
+module.exports =  {getQuote, performSwap, order, executeOrder}
